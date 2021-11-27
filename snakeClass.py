@@ -96,7 +96,7 @@ class Player(object):
                 or self.y > game.game_height - 40 \
                 or [self.x, self.y] in self.position:
             game.crash = True
-        if time.time() - self.time > (game.score*2+40)*(self.speed+16)*0.0041:
+        if time.time() - self.time > (2*game.score+8)*(self.speed+16)/10:
             print("Game break due to taking too long")
             print("Time Elapsed since last pellet eaten: ", time.time()-self.time, " seconds")
             game.crash = True
