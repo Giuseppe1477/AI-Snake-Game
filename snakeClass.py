@@ -1,4 +1,7 @@
+import math
 import os
+import time
+
 import pygame
 import argparse
 import numpy as np
@@ -10,15 +13,16 @@ from keras.utils import to_categorical
 import random
 import statistics
 
+
 def define_parameters():
     params = dict()
     # Neural Network
-    params['epsilon_decay_linear'] = 1/75
-    params['learning_rate'] = 0.0001
-    params['first_layer_size'] = 50   # neurons in the first layer
-    params['second_layer_size'] = 300   # neurons in the second layer
-    params['third_layer_size'] = 50    # neurons in the third layer
-    params['episodes'] = 150           
+    params['epsilon_decay_linear'] = 1 / 75
+    params['learning_rate'] = 0.00005
+    params['first_layer_size'] = 50  # neurons in the first layer
+    params['second_layer_size'] = 300  # neurons in the second layer
+    params['third_layer_size'] = 50  # neurons in the third layer
+    params['episodes'] = 1000
     params['memory_size'] = 2500
     params['batch_size'] = 1000
     # Settings
@@ -28,20 +32,22 @@ def define_parameters():
     params['plot_score'] = True
     return params
 
+
 class Game:
-    def __init__(self, game_width, game_height):
+    def __init__(self, game_width, game_height, speed):
         pygame.display.set_caption('Snake Game 2.0')
         self.game_width = game_width
         self.game_height = game_height
-        self.gameDisplay = pygame.display.set_mode((game_width, game_height + 60))
+        self.gameDisplay = pygame.display.set_mode((game_width + 225, game_height))
         self.bg = pygame.image.load("img/background.png")
         self.crash = False
-        self.player = Player(self)
+        self.player = Player(self, speed)
         self.food = Food()
         self.score = 0
 
+
 class Player(object):
-    def __init__(self, game):
+    def __init__(self, game, speed):
         x = 0.45 * game.game_width
         y = 0.5 * game.game_height
         self.x = x - x % 20
@@ -53,6 +59,8 @@ class Player(object):
         self.image = pygame.image.load('img/snakeBody.png')
         self.x_change = 20
         self.y_change = 0
+        self.time = time.time()
+        self.speed = speed
 
     def update_position(self, x, y):
         if self.position[-1][0] != x or self.position[-1][1] != y:
@@ -88,6 +96,11 @@ class Player(object):
                 or self.y > game.game_height - 40 \
                 or [self.x, self.y] in self.position:
             game.crash = True
+        if time.time() - self.time > (2*game.score+8)*(self.speed+16)/10:
+            print("Game break due to taking too long")
+            print("Time Elapsed since last pellet eaten: ", time.time()-self.time, " seconds")
+            game.crash = True
+
         eat(self, food, game)
 
         self.update_position(self.x, self.y)
@@ -104,6 +117,7 @@ class Player(object):
             update_screen()
         else:
             pygame.time.wait(300)
+
 
 class Food(object):
     def __init__(self):
@@ -125,11 +139,14 @@ class Food(object):
         game.gameDisplay.blit(self.image, (x, y))
         update_screen()
 
+
 def eat(player, food, game):
     if player.x == food.x_food and player.y == food.y_food:
         food.food_coord(game, player)
         player.eaten = True
         game.score = game.score + 1
+        player.time = time.time()
+
 
 def get_record(score, record):
     if score >= record:
@@ -137,27 +154,40 @@ def get_record(score, record):
     else:
         return record
 
+
 def display_ui(game, score, record):
     myfont = pygame.font.SysFont('Segoe UI', 20)
     myfont_bold = pygame.font.SysFont('Segoe UI', 20, True)
-    text_score = myfont_bold.render('Current Score: ', True, (178,34,34))
-    text_score_number = myfont_bold.render(str(score), True, (178,34,34))
-    text_highest = myfont_bold.render('High Score: ', True, (178,34,34))
-    text_highest_number = myfont_bold.render(str(record), True, (178,34,34))
-    game.gameDisplay.blit(text_score, (35, 440))
-    game.gameDisplay.blit(text_score_number, (170, 440))
-    game.gameDisplay.blit(text_highest, (240, 440))
-    game.gameDisplay.blit(text_highest_number, (355, 440))
+    text_score = myfont_bold.render('Current Score: ', True, (178, 34, 34))
+    text_score_number = myfont_bold.render(str(score), True, (178, 34, 34))
+    text_highest = myfont_bold.render('High Score: ', True, (178, 34, 34))
+    text_highest_number = myfont_bold.render(str(record), True, (178, 34, 34))
+    text_createBy = myfont_bold.render('Created By: ', True, (178, 34, 34))
+    text_name1 = myfont_bold.render('Giuseppe Celentano ', True, (178, 34, 34))
+    text_name2 = myfont_bold.render('Brian Temple ', True, (178, 34, 34))
+    text_name3 = myfont_bold.render('Gianni Gabriel ', True, (178, 34, 34))
+    game.gameDisplay.blit(text_score, (480, 35))
+    game.gameDisplay.blit(text_score_number, (540, 60))
+    game.gameDisplay.blit(text_highest, (495, 140))
+    game.gameDisplay.blit(text_highest_number, (540, 165))
+    game.gameDisplay.blit(text_createBy, (450, 265))
+    game.gameDisplay.blit(text_name1, (450, 290))
+    game.gameDisplay.blit(text_name2, (450, 315))
+    game.gameDisplay.blit(text_name3, (450, 340))
     game.gameDisplay.blit(game.bg, (10, 10))
 
+
+
 def display(player, food, game, record):
-    game.gameDisplay.fill((0,0,0))
+    game.gameDisplay.fill((0, 0, 0))
     display_ui(game, game.score, record)
     player.display_player(player.position[-1][0], player.position[-1][1], player.food, game)
     food.display_food(food.x_food, food.y_food, game)
 
+
 def update_screen():
     pygame.display.update()
+
 
 def initialize_game(player, game, food, agent, batch_size):
     state_init1 = agent.get_state(game, player, food)  # [0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0]
@@ -168,39 +198,43 @@ def initialize_game(player, game, food, agent, batch_size):
     agent.remember(state_init1, action, reward1, state_init2, game.crash)
     agent.replay_new(agent.memory, batch_size)
 
-#cut Code
-def plot_seaborn(array_counter, array_score,train):
+
+# cut Code
+def plot_seaborn(array_counter, array_score, train):
     sns.set(color_codes=True, font_scale=1.5)
     sns.set_style("white")
-    plt.figure(figsize=(13,8))
-    if train==False:
+    plt.figure(figsize=(13, 8))
+    if train == False:
         fit_reg = False
     ax = sns.regplot(
         np.array([array_counter])[0],
         np.array([array_score])[0],
-        #color="#36688D",
+        # color="#36688D",
         x_jitter=.1,
         scatter_kws={"color": "#36688D"},
         label='Data',
-        fit_reg = fit_reg,
+        fit_reg=fit_reg,
         line_kws={"color": "#F49F05"}
     )
     # Plot the average line
-    y_mean = [np.mean(array_score)]*len(array_counter)
-    ax.plot(array_counter,y_mean, label='Mean', linestyle='--')
+    y_mean = [np.mean(array_score)] * len(array_counter)
+    ax.plot(array_counter, y_mean, label='Mean', linestyle='--')
     ax.legend(loc='upper right')
     ax.set(xlabel='# games', ylabel='score')
-    plt.ylim(0,65)
+    plt.ylim(0, 65)
     plt.show()
+
 
 def get_mean_stdev(array):
     return statistics.mean(array), statistics.stdev(array)
 
+
 def test(display_option, speed, params):
-    params['load_weights'] = True #change t0 false to train agent
-    params['train'] = False #change t0 true to train agent
+    params['load_weights'] = True  # change t0 false to train agent
+    params['train'] = False  # change t0 true to train agent
     score, mean, stdev = run(display_option, speed, params)
     return score, mean, stdev
+
 
 def run(display_option, speed, params):
     pygame.init()
@@ -220,7 +254,7 @@ def run(display_option, speed, params):
                 pygame.quit()
                 quit()
         # Initialize classes
-        game = Game(440, 440)
+        game = Game(440, 440, speed)
         player1 = game.player
         food1 = game.food
 
@@ -280,6 +314,7 @@ def run(display_option, speed, params):
     print('Total score: {}   Mean: {}   Std dev:   {}'.format(total_score, mean, stdev))
     return total_score, mean, stdev
 
+
 if __name__ == '__main__':
     # Set options to activate or deactivate the game view, and its speed
     pygame.font.init()
@@ -288,5 +323,5 @@ if __name__ == '__main__':
     parser.add_argument("--display", type=bool, default=False)
     parser.add_argument("--speed", type=int, default=50)
     args = parser.parse_args()
-    params['bayesian_optimization'] = False    # Use bayesOpt.py for Bayesian Optimization
+    params['bayesian_optimization'] = False
     run(args.display, args.speed, params)
