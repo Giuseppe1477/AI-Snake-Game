@@ -17,10 +17,8 @@ Arguments description:
 This will run and show the agent. The default configuration loads the file *weights/weights.hdf5* and runs a test.
 The Deep neural network can be customized in the file snakeClass.py modifying the dictionary *params* in the function *define_parameters()*
 
-To train the agent, set in the file snakeClass.py:
-- params['load_weights'] = False
-- params['train'] = True
+## Untrained Version of AI Snake Agent
+https://user-images.githubusercontent.com/11039118/148360955-cf27e96a-015b-4177-87ee-ea27437ccd2c.mp4
 
-In snakeClass.py you can set argument *--display*=False and *--speed*=0, if you do not want to see the game running. This speeds up the training phase.
-
-Make sure to succesfully install all packages included in the requirements.txt file
+## Trained Agent After 1-1.5hrs
+https://user-images.githubusercontent.com/11039118/148362370-e22a0545-385f-41c5-907c-338d4d72b905.mp4
