@@ -20,9 +20,8 @@ This will run and show the agent. The default configuration loads the file *weig
 The Deep neural network can be customized in the file snakeClass.py modifying the dictionary *params* in the function *define_parameters()*
 
 ## Untrained Version of AI Snake Agent
-https://user-images.githubusercontent.com/11039118/148360955-cf27e96a-015b-4177-87ee-ea27437ccd2c.mp4
-
+https://user-images.githubusercontent.com/11039118/148363185-7f7c90b9-496e-42bc-85eb-8ebd9f65b8c4.mp4
 
 
 ## Trained Version of AI Snake Agent
-https://user-images.githubusercontent.com/11039118/148362370-e22a0545-385f-41c5-907c-338d4d72b905.mp4
+https://user-images.githubusercontent.com/11039118/148363133-ae7d688c-ee27-4c90-8ea5-247c8cd891b9.mp4
