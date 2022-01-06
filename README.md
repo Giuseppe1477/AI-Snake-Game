@@ -2,7 +2,7 @@
 **This project requires Python 3.6** 
 with the pygame library installed, as well as Keras with Tensorflow backend.
 ```bash
-git clone git@github.com:atvjoey/cs301AIgame.git
+git clone git@github.com:atvjoey/AI-Snake-Game.git
 ```
 
 ## Run
